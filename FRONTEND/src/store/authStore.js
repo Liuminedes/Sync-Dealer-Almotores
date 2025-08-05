@@ -28,6 +28,8 @@ export const useAuthStore = create((set, get) => ({
       console.log("❌ Error en checkAuth:", error.response?.data?.message);
       set({ authUser: null, token: null });
       localStorage.removeItem("token");
+
+      console.log("Token actual:", localStorage.getItem("token"));
       delete axiosInstance.defaults.headers.common["Authorization"];
     } finally {
       set({ isCheckingAuth: false, isAuthLoaded: true }); // 🧠 clave
