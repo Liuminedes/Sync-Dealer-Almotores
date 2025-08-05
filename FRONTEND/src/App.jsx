@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
 import AppRouter from "./routes/AppRouter";
 import { axiosInstance } from "./lib/axios";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { checkAuth, isCheckingAuth } = useAuthStore();
 
-  // Verifica token al cargar la app
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -15,7 +15,6 @@ function App() {
     checkAuth();
   }, []);
 
-  // Mientras verifica, muestra loader
   if (isCheckingAuth) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -25,7 +24,12 @@ function App() {
     );
   }
 
-  return <AppRouter />;
+  return (
+    <>
+      <AppRouter />
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+    </>
+  );
 }
 
 export default App;

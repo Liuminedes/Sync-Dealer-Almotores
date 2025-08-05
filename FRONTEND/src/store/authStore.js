@@ -7,6 +7,7 @@ export const useAuthStore = create((set, get) => ({
   token: null,
 
   isCheckingAuth: true,
+  isAuthLoaded: false, // 🆕 flag importante
   isLoggingIn: false,
   isSigningUp: false,
 
@@ -29,17 +30,15 @@ export const useAuthStore = create((set, get) => ({
       localStorage.removeItem("token");
       delete axiosInstance.defaults.headers.common["Authorization"];
     } finally {
-      set({ isCheckingAuth: false });
+      set({ isCheckingAuth: false, isAuthLoaded: true }); // 🧠 clave
     }
   },
 
-  // ✅ Registro de usuarios
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/register", data);
       toast.success("Usuario registrado correctamente");
-      // Opcional: iniciar sesión automáticamente
     } catch (error) {
       toast.error(error.response?.data?.message || "Error al registrar");
     } finally {
@@ -47,30 +46,31 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ✅ Login y guardar token + usuario
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      const { token, user } = res.data;
+      const { token } = res.data;
 
       localStorage.setItem("token", token);
       axiosInstance.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${token}`;
-      set({ authUser: user, token });
 
-      toast.success("Bienvenido " + user.fullName);
-      return true; // ✅ Necesario
+      // 🔥 Esta línea es la que faltaba
+      await get().checkAuth();
+
+      toast.success("Bienvenido");
+
+      return true;
     } catch (error) {
       toast.error(error.response?.data?.message || "Error al iniciar sesión");
-      return false; // ✅ Para manejarlo en el Login.jsx
+      return false;
     } finally {
       set({ isLoggingIn: false });
     }
   },
 
-  // ✅ Logout
   logout: () => {
     localStorage.removeItem("token");
     delete axiosInstance.defaults.headers.common["Authorization"];
