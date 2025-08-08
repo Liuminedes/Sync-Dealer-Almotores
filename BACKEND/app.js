@@ -1,27 +1,30 @@
-const express = require('express');
-const cors = require('cors');
-const { sequelize } = require('./models');
-require('dotenv').config();
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { sequelize } from "./models/index.js";
+import router from "./routes/index.js";
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Ruta base
-app.get('/', (req, res) => res.send('Sync Dealer API funcionando 🚗'));
+app.get("/", (_, res) => {
+  res.send("🚗 Sync Dealer API activa.");
+});
 
-// Conexión y sync
-sequelize.authenticate()
-  .then(() => {
-    console.log('✅ Conectado a la base de datos MySQL');
-    return sequelize.sync({ alter: true }); // usar { force: true } para wipe
-  })
-  .then(() => {
-    console.log('✅ Modelos sincronizados');
-    app.listen(process.env.PORT, () => {
-      console.log(`🚀 Servidor corriendo en puerto ${process.env.PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error('❌ Error conectando la base de datos:', err);
-  });
+// 📌 Montar rutas protegidas
+app.use("/api", router);
+
+// 🟢 Iniciar servidor (ya sin sync innecesario)
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Conexión a la base de datos confirmada");
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  } catch (error) {
+    console.error("❌ Error de conexión a MySQL:", error.message);
+  }
+});
