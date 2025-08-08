@@ -28,3 +28,4 @@ app.listen(PORT, async () => {
     console.error("❌ Error de conexión a MySQL:", error.message);
   }
 });
+

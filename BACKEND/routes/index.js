@@ -5,7 +5,7 @@ import branchRoutes from "./branch.routes.js";
 import vehicleRoutes from "./vehicle.routes.js";
 import commissionRoutes from "./commission.routes.js";
 
-import { protectRoute } from "../middleware/auth.middleware.js";
+import { protectRoute } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
